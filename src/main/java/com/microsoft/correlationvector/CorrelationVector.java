@@ -14,7 +14,6 @@ import java.nio.ByteBuffer;
 import java.text.MessageFormat;
 import java.util.Random;
 import java.util.UUID;
-import java.util.Base64;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -54,7 +53,7 @@ public class CorrelationVector {
         uuidBytes.putLong(uuid.getMostSignificantBits());
         uuidBytes.putLong(uuid.getLeastSignificantBits());
         // Removes the  base64 padding
-        String cvBase = Base64.getEncoder().encodeToString(uuidBytes.array());
+        String cvBase = Base64Encoder.toBase64String(uuidBytes);
         return cvBase.substring(0, BaseLengthV2);
     }
 
@@ -67,7 +66,7 @@ public class CorrelationVector {
 
             uuidBytes.putLong(uuid.getMostSignificantBits());
             uuidBytes.putInt((int)(uuid.getLeastSignificantBits()>> 32));
-            String cvBase = Base64.getEncoder().encodeToString(uuidBytes.array());
+            String cvBase = Base64Encoder.toBase64String(uuidBytes);
             return cvBase;
         }
         else if (CorrelationVectorVersion.V2 == version)

@@ -10,13 +10,12 @@
  */
 package com.microsoft.correlationvector;
 
-import java.time.Instant;
 
 public class DateTimeUtils {
 
     private static final int TicksInMilliseconds = 10000;
+
     public static long getTicksSinceEpoch() {
-        Instant instant = Instant.now();
-        return instant.toEpochMilli() * TicksInMilliseconds;
+        return System.currentTimeMillis() * TicksInMilliseconds;
     }
 }

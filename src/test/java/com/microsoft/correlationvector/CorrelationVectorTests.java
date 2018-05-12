@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -23,10 +22,10 @@ public class CorrelationVectorTests {
     @Test public void CorrelationVector_Increment_Is_Unique_Across_Multiple_Threads(){
         final int numberOfThreads = 1000;
         CorrelationVector cV = new CorrelationVector();
-        CorrelationVector cV2 = CorrelationVector.extend(cV.getValue());
+        final CorrelationVector cV2 = CorrelationVector.extend(cV.getValue());
 
         ArrayList<Thread> threads = new ArrayList<>();
-        ConcurrentLinkedQueue<String> incrementedCvs = new ConcurrentLinkedQueue<>();
+        final ConcurrentLinkedQueue<String> incrementedCvs = new ConcurrentLinkedQueue<>();
 
         for (int i = 0; i < numberOfThreads; i++)
         {
@@ -110,7 +109,7 @@ public class CorrelationVectorTests {
         uuidBytes.putLong(uuid.getMostSignificantBits());
         uuidBytes.putLong(uuid.getLeastSignificantBits());
 
-        String expectedCvBase = Base64.getEncoder().encodeToString(uuidBytes.array()).substring(0,22);
+        String expectedCvBase = Base64Encoder.toBase64String(uuidBytes).substring(0,22);
 
         CorrelationVector cV = new CorrelationVector(uuid);
         Assert.assertEquals(cV.getVersion(), CorrelationVectorVersion.V2);
