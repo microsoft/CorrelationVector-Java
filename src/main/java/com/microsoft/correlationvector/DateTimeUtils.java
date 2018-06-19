@@ -3,19 +3,22 @@
  * <p/>
  * All rights reserved.
  * <p/>
- *
- * @author  Ayushi Batra
- * @version 1.0
- * @since   05-06-2018
  */
 package com.microsoft.correlationvector;
 
-
+/**
+ * DateTimeUtilties that helps with CV's Spin operation.
+ */
 public class DateTimeUtils {
 
-    private static final int TicksInMilliseconds = 10000;
+    private static final int TICKS_IN_MILLISECONDS = 10000;
 
+    /**
+     * Gets the number of ticks since epoch time.
+     *
+     * @return number of ticks since epoch.
+     */
     public static long getTicksSinceEpoch() {
-        return System.currentTimeMillis() * TicksInMilliseconds;
+        return System.currentTimeMillis() * TICKS_IN_MILLISECONDS;
     }
 }

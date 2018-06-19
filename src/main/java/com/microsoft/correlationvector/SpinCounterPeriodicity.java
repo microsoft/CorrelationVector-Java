@@ -3,40 +3,52 @@
  * <p/>
  * All rights reserved.
  * <p/>
- *
- * @author  Ayushi Batra
- * @version 1.0
- * @since   05-06-2018
  */
 package com.microsoft.correlationvector;
 
-public enum SpinCounterPeriodicity
-{
-    /**
-     * <summary>
-     *   Do not store a counter as part of the spin value.
-     * </summary>
-     */
-    None,
+/**
+ * Counter for CV's Spin operation.
+ */
+public enum SpinCounterPeriodicity {
 
     /**
-     * <summary>
-     *   The short periodicity stores the counter using 16 bits.
-     * </summary>
+     * Do not store a counter as part of the spin value.
      */
-    Short,
+    None(0),
+    /**
+     * The short periodicity stores the counter using 16 bits.
+     */
+    Short(16),
+    /**
+     * The medium periodicity stores the counter using 24 bits.
+     */
+    Medium(24),
+    /**
+     * The long periodicity stores the counter using 32 bits.
+     */
+    Long(32);
 
     /**
-     * <summary>
-     *   The medium periodicity stores the counter using 24 bits.
-     * </summary>
+     * Counter periodicity.
      */
-    Medium,
+    private final int periodicity;
 
     /**
-     * <summary>
-     *  The long periodicity stores the counter using 32 bits.
-     * </summary>
+     * SpinCounterPeriodicity Constructor.
+     *
+     * @param periodicity
+     *            Counter periodicity.
      */
-    Long
+    private SpinCounterPeriodicity(int periodicity) {
+        this.periodicity = periodicity;
+    }
+
+    /**
+     * Gets the counter periodicity.
+     *
+     * @return periodicity
+     */
+    public int getPeriodicity() {
+        return this.periodicity;
+    }
 }
