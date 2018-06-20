@@ -3,47 +3,56 @@
  * <p/>
  * All rights reserved.
  * <p/>
- *
- * @author  Ayushi Batra
- * @version 1.0
- * @since   05-06-2018
  */
 package com.microsoft.correlationvector;
 
-public enum SpinEntropy
-{
-    /**
-     * <summary>
-     *   Do not generate entropy as part of the spin value.
-     * </summary>
-     */
-    None,
+/**
+ * Entropy bytes that is used for CV's Spin operation.
+ */
+public enum SpinEntropy {
 
     /**
-     * <summary>
-     *   Generate entropy using 8 bits.
-     * </summary>
+     * Do not generate entropy as part of the spin value.
      */
-    One,
+    None(0),
+    /**
+     * Generate entropy using 8 bits.
+     */
+    One(1),
+    /**
+     * Generate entropy using 16 bits.
+     */
+    Two(2),
+    /**
+     * Generate entropy using 24 bits.
+     */
+    Three(3),
+    /**
+     * Generate entropy using 32 bits.
+     */
+    Four(4);
 
     /**
-     * <summary>
-     *   Generate entropy using 16 bits.
-     * </summary>
+     * Entropy byte size.
      */
-    Two,
+    private final int entropyBytes;
 
     /**
-     * <summary>
-     *   Generate entropy using 24 bits.
-     * </summary>
+     * SpinEntropy Constructor.
+     *
+     * @param entropyBytes
+     *            number of bytes for entropy.
      */
-    Three,
+    private SpinEntropy(int entropyBytes) {
+        this.entropyBytes = entropyBytes;
+    }
 
     /**
-     * <summary>
-     *   Generate entropy using 32 bits.
-     * </summary>
+     * Gets the entropy byte size.
+     *
+     * @return entropy byte size.
      */
-    Four
+    public int getEntropyBytes() {
+        return this.entropyBytes;
+    }
 }

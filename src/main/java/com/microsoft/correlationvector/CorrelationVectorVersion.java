@@ -10,9 +10,9 @@
  */
 package com.microsoft.correlationvector;
 
-public enum CorrelationVectorVersion
-{
-    V1,
-    V2,
+/**
+ * CorrelationVector Version enumerations.
+ */
+public enum CorrelationVectorVersion {
+    V1, V2;
 }
-

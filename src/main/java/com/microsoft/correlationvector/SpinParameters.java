@@ -3,22 +3,30 @@
  * <p/>
  * All rights reserved.
  * <p/>
- *
- * @author  Ayushi Batra
- * @version 1.0
- * @since   05-06-2018
  */
 package com.microsoft.correlationvector;
 
+/**
+ * Configuration parameters used by CV's Spin operation.
+ */
 public class SpinParameters {
 
-    // Internal value for entropy bytes.
-    private int entropyBytes;
-    SpinCounterInterval interval;
-    SpinCounterPeriodicity periodicity;
+    /**
+     * Number of bits in a byte.
+     */
+    public static final int BITS_IN_BYTE = 8;
 
+    private SpinEntropy entropy;
+    private SpinCounterInterval interval;
+    private SpinCounterPeriodicity periodicity;
+
+    /**
+     * Gets a default set of configuration parameters for Spin operation.
+     *
+     * @return Default SpinParameters.
+     */
     public static SpinParameters getDefaultParameters() {
-        SpinParameters params = new SpinParameters();
+        final SpinParameters params = new SpinParameters();
         params.setInterval(SpinCounterInterval.Coarse);
         params.setPeriodicity(SpinCounterPeriodicity.Short);
         params.setEntropy(SpinEntropy.Two);
@@ -26,119 +34,87 @@ public class SpinParameters {
     }
 
     /**
-     * <summary>
-     *   The interval (proportional to time) by which the counter increments.
-     * </summary>
+     * Gets the number of bytes to use for entropy. Valid values from a minimum of 0
+     * to a maximum of 4.
      */
-    public SpinCounterInterval getInterval(){
-        return interval;
-    }
-
-    public void setInterval(SpinCounterInterval value){
-        interval = value;
+    public SpinEntropy getEntropy() {
+        return this.entropy;
     }
 
     /**
-     * <summary>
-     *   How frequently the counter wraps around to zero, as determined by the amount
-     *   of space to store the counter.
-     * </summary>
-     */
-    public SpinCounterPeriodicity getPeriodicity() {
-        return periodicity;
-    }
-
-    public void setPeriodicity(SpinCounterPeriodicity value) {
-        periodicity = value;
-    }
-
-    /**
-     * <summary>
-     *   The number of bytes to use for entropy. Valid values from a
-     *   minimum of 0 to a maximum of 4.
-     * </summary>
-     */
-    public SpinEntropy getEntropy()
-    {
-        switch (this.entropyBytes) {
-            case 0: return SpinEntropy.None;
-            case 1: return SpinEntropy.One;
-            case 2: return SpinEntropy.Two;
-            case 3: return SpinEntropy.Three;
-            case 4: return SpinEntropy.Four;
-        }
-
-        return SpinEntropy.None;
-    }
-
-    public void setEntropy(SpinEntropy value) {
-        switch (value){
-            case None:
-                this.entropyBytes = 0;
-                break;
-            case One:
-                this.entropyBytes = 1;
-                break;
-            case Two:
-                this.entropyBytes = 2;
-                break;
-            case Three:
-                this.entropyBytes = 3;
-                break;
-            case Four:
-                this.entropyBytes = 4;
-                break;
-        }
-    }
-
-    /**
-     * <summary>
-     *   The number of least significant bits to drop in DateTime.Ticks when
-     *   computing the counter.
-     * </summary>
-     */
-    public int getTicksBitsToDrop()
-    {
-        switch (interval) {
-            case Coarse:
-                return 24;
-
-            case Fine:
-                return 16;
-
-            default:
-                return 24;
-        }
-    }
-
-    /**
-     * <summary>
-     *   The number of bytes used to store the entropy.
-     * </summary>
+     * Gets the number of bytes used to store the entropy.
+     *
+     * @return entropyBytes.
      */
     public int getEntropyBytes() {
-        return this.entropyBytes;
+        return this.entropy.getEntropyBytes();
     }
 
+    /**
+     * The interval (proportional to time) by which the counter increments.
+     *
+     * @return Counter Interval.
+     */
+    public SpinCounterInterval getInterval() {
+        return this.interval;
+    }
+
+    /**
+     * Gets how frequently the counter wraps around to zero, as determined by the
+     * amount of space to store the counter.
+     *
+     * @return counter periodicity.
+     */
+    public SpinCounterPeriodicity getPeriodicity() {
+        return this.periodicity;
+    }
+
+    /**
+     * Gets the number of least significant bits to drop in DateTime.Ticks when
+     * computing the counter.
+     *
+     * @return number of ticksBits to drop.
+     */
+    public int getTicksBitsToDrop() {
+        return this.interval.getTicksBitsToDrop();
+    }
+
+    /**
+     * Gets the total number of bits to keep for the Spin operation.
+     *
+     * @return Total number of bits.
+     */
     public int getTotalBits() {
-        int counterBits;
-        switch (periodicity) {
-            case None:
-                counterBits = 0;
-                break;
-            case Short:
-                counterBits = 16;
-                break;
-            case Medium:
-                counterBits = 24;
-                break;
-            case Long:
-                counterBits = 32;
-                break;
-            default:
-                counterBits = 0;
-                break;
-        }
-        return counterBits + entropyBytes * 8;
+        return this.periodicity.getPeriodicity() + (this.entropy.getEntropyBytes() * BITS_IN_BYTE);
+    }
+
+    /**
+     * Sets the entropy.
+     *
+     * @param value
+     *            entropy value.
+     */
+    public void setEntropy(SpinEntropy value) {
+        this.entropy = value;
+    }
+
+    /**
+     * Sets the SpinCounterInterval with given value.
+     *
+     * @param value
+     *            - SpinCounterInterval.
+     */
+    public void setInterval(SpinCounterInterval value) {
+        this.interval = value;
+    }
+
+    /**
+     * Sets the counter periodicity with the given value.
+     *
+     * @param value
+     *            - SpinCounterPeriodicity.
+     */
+    public void setPeriodicity(SpinCounterPeriodicity value) {
+        this.periodicity = value;
     }
 }
