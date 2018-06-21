@@ -28,6 +28,10 @@ public class CorrelationVector {
      */
     public static final char CV_DELIMITER = '.';
     /**
+     * CV vector terminator.
+     */
+    public static final char CV_TERMINATOR = '!';
+    /**
      * Gets or sets a value indicating whether or not to validate the correlation
      * vector on creation.
      */
@@ -44,7 +48,11 @@ public class CorrelationVector {
 
     private final CorrelationVectorVersion version;
 
-    private String baseVector = null;
+    private final String baseVector;
+    /**
+     * Indicates whether the CV object is immutable.
+     */
+    private boolean isImmutable;
 
     /**
      * Creates a new correlation vector by extending an existing value. This should
@@ -55,6 +63,10 @@ public class CorrelationVector {
      */
     public static CorrelationVector extend(String correlationVector) {
 
+        if (isImmutable(correlationVector)) {
+            return CorrelationVector.parse(correlationVector);
+        }
+
         final CorrelationVectorVersion version = CorrelationVector.inferVersion(correlationVector,
                 CorrelationVector.VALIDATE_CV_DURING_CREATION);
 
@@ -62,7 +74,11 @@ public class CorrelationVector {
             CorrelationVector.validate(correlationVector, version);
         }
 
-        return new CorrelationVector(correlationVector, 0, version);
+        if (isOversized(correlationVector, 0, version)) {
+            return parse(correlationVector + CV_TERMINATOR);
+        } else {
+            return new CorrelationVector(correlationVector, 0, version, false);
+        }
     }
 
     /**
@@ -76,11 +92,16 @@ public class CorrelationVector {
 
         if (!((correlationVector == null) || correlationVector.trim().isEmpty())) {
             final int p = correlationVector.lastIndexOf(CV_DELIMITER);
+            final boolean isImmutable = isImmutable(correlationVector);
+
             if (p > 0) {
-                final int extension = Integer.parseInt(correlationVector.substring(p + 1));
+                final String extensionVal = isImmutable
+                        ? correlationVector.substring(p + 1, correlationVector.length() - 1)
+                        : correlationVector.substring(p + 1);
+                final int extension = Integer.parseInt(extensionVal);
                 if (extension >= 0) {
                     return new CorrelationVector(correlationVector.substring(0, p), extension,
-                            CorrelationVector.inferVersion(correlationVector, false));
+                            CorrelationVector.inferVersion(correlationVector, false), isImmutable);
                 }
             }
         }
@@ -113,6 +134,10 @@ public class CorrelationVector {
      */
     public static CorrelationVector spin(String correlationVector, SpinParameters parameters) {
 
+        if (isImmutable(correlationVector)) {
+            return parse(correlationVector);
+        }
+
         final CorrelationVectorVersion version = CorrelationVector.inferVersion(correlationVector,
                 CorrelationVector.VALIDATE_CV_DURING_CREATION);
 
@@ -138,7 +163,12 @@ public class CorrelationVector {
             s = (value >> 32) + CV_DELIMITER + s;
         }
 
-        return new CorrelationVector(correlationVector + CV_DELIMITER + s, 0, version);
+        String baseVector = new StringBuilder(correlationVector).append(CV_DELIMITER).append(s).toString();
+        if (isOversized(baseVector, 0, version)) {
+            return parse(correlationVector + CV_TERMINATOR);
+        } else {
+            return new CorrelationVector(correlationVector + CV_DELIMITER + s, 0, version, false);
+        }
     }
 
     /**
@@ -206,6 +236,51 @@ public class CorrelationVector {
     }
 
     /**
+     * Gets the length of an integer. The given integer must be non-negative.
+     * 
+     * @param i
+     *            non-negative integer.
+     * @return length of the given integer.
+     */
+    private static int intLength(int i) {
+        return (i == 0) ? 1 : (int) Math.log10(i) + 1;
+    }
+
+    /**
+     * Checks if the given CV string is immutable. If the given non-empty string
+     * ends with the CV termination sign, the CV is said to be immutable.
+     * 
+     * @param correlationVector
+     *            CV in string.
+     * @return true is the given CV string is immutable.
+     */
+    private static boolean isImmutable(String correlationVector) {
+        return correlationVector != null && !correlationVector.isEmpty()
+                && correlationVector.endsWith(CV_TERMINATOR + "");
+    }
+
+    /**
+     * Checks if the given CV is oversized.
+     * 
+     * @param baseVector
+     *            baseVector from the incoming request.
+     * @param extension
+     *            extension number.
+     * @param version
+     *            CV version.
+     * @return true is the CV is oversized.
+     */
+    private static boolean isOversized(String baseVector, int extension, CorrelationVectorVersion version) {
+        if (baseVector == null || baseVector.isEmpty()) {
+            return false;
+        }
+
+        int cvLen = baseVector.length() + 1 + intLength(extension);
+        return (version == CorrelationVectorVersion.V1 && cvLen > MAX_CV_LENGTH)
+                || (version == CorrelationVectorVersion.V2 && cvLen > MAX_CV_LENGTH_V2);
+    }
+
+    /**
      * Validates the CV string with the given CV version.
      *
      * @param correlationVector
@@ -270,7 +345,7 @@ public class CorrelationVector {
      *            The correlation vector implementation version.
      */
     public CorrelationVector(CorrelationVectorVersion version) {
-        this(CorrelationVector.getUniqueValue(version), 0, version);
+        this(CorrelationVector.getUniqueValue(version), 0, version, false);
     }
 
     /**
@@ -281,13 +356,14 @@ public class CorrelationVector {
      *            The Guid to use as a correlation vector base.
      */
     public CorrelationVector(UUID vectorBase) {
-        this(CorrelationVector.getBaseFromGuid(vectorBase), 0, CorrelationVectorVersion.V2);
+        this(CorrelationVector.getBaseFromGuid(vectorBase), 0, CorrelationVectorVersion.V2, false);
     }
 
-    private CorrelationVector(String baseVector, int extension, CorrelationVectorVersion version) {
+    private CorrelationVector(String baseVector, int extension, CorrelationVectorVersion version, boolean isImmutable) {
         this.baseVector = baseVector;
         this.extension = new AtomicInteger(extension);
         this.version = version;
+        this.isImmutable = isImmutable || isOversized(baseVector, extension, version);
     }
 
     @Override
@@ -319,7 +395,11 @@ public class CorrelationVector {
      * @return CV in string.
      */
     public String getValue() {
-        return this.baseVector + CV_DELIMITER + this.extension;
+        final StringBuilder s = new StringBuilder(this.baseVector).append(CV_DELIMITER).append(this.extension);
+        if (this.isImmutable) {
+            s.append(CV_TERMINATOR);
+        }
+        return s.toString();
     }
 
     /**
@@ -339,6 +419,11 @@ public class CorrelationVector {
      *         header.
      */
     public String increment() {
+
+        if (this.isImmutable) {
+            return getValue();
+        }
+
         int snapshot = 0;
         int next = 0;
         do {
@@ -347,12 +432,13 @@ public class CorrelationVector {
                 return this.getValue();
             }
             next = snapshot + 1;
-            final int size = this.baseVector.length() + 1 + (int) Math.log10(next) + 1;
-            if (((this.version == CorrelationVectorVersion.V1) && (size > CorrelationVector.MAX_CV_LENGTH))
-                    || ((this.version == CorrelationVectorVersion.V2) && (size > CorrelationVector.MAX_CV_LENGTH_V2))) {
+
+            if (isOversized(this.baseVector, next, this.version)) {
+                this.isImmutable = true;
                 return this.getValue();
             }
         } while (!this.extension.compareAndSet(snapshot, next));
+
         return this.baseVector + CV_DELIMITER + next;
     }
 

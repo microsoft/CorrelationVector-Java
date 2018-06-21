@@ -50,7 +50,7 @@ public class CorrelationVectorTests {
             unique.add(incrementedCv);
         }
 
-        Assert.assertEquals(unique.size(), numberOfThreads);
+        Assert.assertEquals(numberOfThreads, unique.size());
     }
 
     // create correlation vector from string
@@ -59,15 +59,15 @@ public class CorrelationVectorTests {
         final CorrelationVector cV = CorrelationVector.extend("tul4NUsfs9Cl7mOf.1");
         final String[] splitCv = cV.getValue().split("\\.");
 
-        Assert.assertEquals(splitCv.length, 3);
-        Assert.assertEquals(splitCv[2], "0");
+        Assert.assertEquals(3, splitCv.length);
+        Assert.assertEquals("0", splitCv[2]);
 
         final String incrementedCv = cV.increment();
         final String[] splitIncrementedCv = incrementedCv.split("\\.");
-        Assert.assertEquals(splitIncrementedCv.length, 3);
-        Assert.assertEquals(splitIncrementedCv[2], "1");
+        Assert.assertEquals(3, splitIncrementedCv.length);
+        Assert.assertEquals("1", splitIncrementedCv[2]);
 
-        Assert.assertEquals(cV.toString(), "tul4NUsfs9Cl7mOf.1.1");
+        Assert.assertEquals("tul4NUsfs9Cl7mOf.1.1", cV.toString());
     }
 
     @Test
@@ -75,15 +75,15 @@ public class CorrelationVectorTests {
         final CorrelationVector cV = CorrelationVector.extend("KZY+dsX2jEaZesgCPjJ2Ng.1");
         final String[] splitCv = cV.getValue().split("\\.");
 
-        Assert.assertEquals(splitCv.length, 3);
-        Assert.assertEquals(splitCv[2], "0");
+        Assert.assertEquals(3, splitCv.length);
+        Assert.assertEquals("0", splitCv[2]);
 
         final String incrementedCv = cV.increment();
         final String[] splitIncrementedCv = incrementedCv.split("\\.");
-        Assert.assertEquals(splitIncrementedCv.length, 3);
-        Assert.assertEquals(splitIncrementedCv[2], "1");
+        Assert.assertEquals(3, splitIncrementedCv.length);
+        Assert.assertEquals("1", splitIncrementedCv[2]);
 
-        Assert.assertEquals(cV.toString(), "KZY+dsX2jEaZesgCPjJ2Ng.1.1");
+        Assert.assertEquals("KZY+dsX2jEaZesgCPjJ2Ng.1.1", cV.toString());
     }
 
     // create, extend and increment correlation vector default
@@ -92,14 +92,14 @@ public class CorrelationVectorTests {
         final CorrelationVector cv = new CorrelationVector();
         final String[] splitCv = cv.getValue().split("\\.");
 
-        Assert.assertEquals(splitCv.length, 2);
-        Assert.assertEquals(splitCv[0].length(), 16);
-        Assert.assertEquals(splitCv[1], "0");
+        Assert.assertEquals(2, splitCv.length);
+        Assert.assertEquals(16, splitCv[0].length());
+        Assert.assertEquals("0", splitCv[1]);
 
         final String incrementedCv = cv.increment();
         final String[] splitIncrementedCv = incrementedCv.split("\\.");
-        Assert.assertEquals(splitIncrementedCv.length, 2);
-        Assert.assertEquals(splitIncrementedCv[1], "1");
+        Assert.assertEquals(2, splitIncrementedCv.length);
+        Assert.assertEquals("1", splitIncrementedCv[1]);
     }
 
     // create, extend and increment correlation vector V1
@@ -108,14 +108,14 @@ public class CorrelationVectorTests {
         final CorrelationVector cv = new CorrelationVector();
         final String[] splitCv = cv.getValue().split("\\.");
 
-        Assert.assertEquals(splitCv.length, 2);
-        Assert.assertEquals(splitCv[0].length(), 16);
-        Assert.assertEquals(splitCv[1], "0");
+        Assert.assertEquals(2, splitCv.length);
+        Assert.assertEquals(16, splitCv[0].length());
+        Assert.assertEquals("0", splitCv[1]);
 
         final String incrementedCv = cv.increment();
         final String[] splitIncrementedCv = incrementedCv.split("\\.");
-        Assert.assertEquals(splitIncrementedCv.length, 2);
-        Assert.assertEquals(splitIncrementedCv[1], "1");
+        Assert.assertEquals(2, splitIncrementedCv.length);
+        Assert.assertEquals("1", splitIncrementedCv[1]);
     }
 
     // create, extend and increment correlation vector V2
@@ -126,14 +126,14 @@ public class CorrelationVectorTests {
 
         final String[] splitCv = cv.getValue().split("\\.");
 
-        Assert.assertEquals(splitCv.length, 2);
-        Assert.assertEquals(splitCv[0].length(), 22);
-        Assert.assertEquals(splitCv[1], "0");
+        Assert.assertEquals(2, splitCv.length);
+        Assert.assertEquals(22, splitCv[0].length());
+        Assert.assertEquals("0", splitCv[1]);
 
         final String incrementedCv = cv.increment();
         final String[] splitIncrementedCv = incrementedCv.split("\\.");
-        Assert.assertEquals(splitIncrementedCv.length, 2);
-        Assert.assertEquals(splitIncrementedCv[1], "1");
+        Assert.assertEquals(2, splitIncrementedCv.length);
+        Assert.assertEquals("1", splitIncrementedCv[1]);
     }
 
     // create, extend and increment correlation vector V2 from guid
@@ -148,18 +148,36 @@ public class CorrelationVectorTests {
         final String expectedCvBase = Base64Encoder.toBase64String(uuidBytes).substring(0, 22);
 
         final CorrelationVector cV = new CorrelationVector(uuid);
-        Assert.assertEquals(cV.getVersion(), CorrelationVectorVersion.V2);
+        Assert.assertEquals(CorrelationVectorVersion.V2, cV.getVersion());
 
         final String[] splitCv = cV.getValue().split("\\.");
-        Assert.assertEquals(splitCv.length, 2);
-        Assert.assertEquals(splitCv[0].length(), 22);
+        Assert.assertEquals(2, splitCv.length);
+        Assert.assertEquals(22, splitCv[0].length());
         Assert.assertEquals(expectedCvBase, splitCv[0]);
-        Assert.assertEquals(splitCv[1], "0");
+        Assert.assertEquals("0", splitCv[1]);
 
         final String incrementedCv = cV.increment();
         final String[] splitIncrementedCv = incrementedCv.split("\\.");
-        Assert.assertEquals(splitIncrementedCv.length, 2);
-        Assert.assertEquals(splitIncrementedCv[1], "1");
+        Assert.assertEquals(2, splitIncrementedCv.length);
+        Assert.assertEquals("1", splitIncrementedCv[1]);
+    }
+
+    @Test
+    public void extendOverMaxCVLength() {
+
+        final String baseVector = "tul4NUsfs9Cl7mOf.2147483647.2147483647.2147483647.214748364.23";
+
+        CorrelationVector cv = CorrelationVector.extend(baseVector);
+        Assert.assertEquals(baseVector + CorrelationVector.CV_TERMINATOR, cv.getValue());
+    }
+
+    @Test
+    public void extendOverMaxCVLengthV2() {
+
+        final String baseVector = "KZY+dsX2jEaZesgCPjJ2Ng.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2141";
+
+        CorrelationVector cv = CorrelationVector.extend(baseVector);
+        Assert.assertEquals(baseVector + CorrelationVector.CV_TERMINATOR, cv.getValue());
     }
 
     // extend null correlation vector
@@ -168,12 +186,32 @@ public class CorrelationVectorTests {
         final String nullString = "";
 
         final CorrelationVector cV = CorrelationVector.extend(nullString);
-        Assert.assertEquals(cV.toString(), ".0");
+        Assert.assertEquals(".0", cV.toString());
 
         CorrelationVector.VALIDATE_CV_DURING_CREATION = true;
 
         final CorrelationVector cV2 = CorrelationVector.extend(nullString);
-        Assert.assertEquals(cV2.toString(), ".0");
+        Assert.assertEquals(".0", cV2.toString());
+    }
+
+    @Test
+    public void immutableCVWithTerminator() {
+
+        String cvStr = "tul4NUsfs9Cl7mOf.2147483647.2147483647.2147483647.21474836479.0!";
+
+        Assert.assertEquals(cvStr, CorrelationVector.parse(cvStr).increment());
+        Assert.assertEquals(cvStr, CorrelationVector.extend(cvStr).getValue());
+        Assert.assertEquals(cvStr, CorrelationVector.spin(cvStr).getValue());
+    }
+
+    @Test
+    public void immutableCVWIthTerminatorV2() {
+
+        String cvStr = "KZY+dsX2jEaZesgCPjJ2Ng.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.214.0!";
+
+        Assert.assertEquals(cvStr, CorrelationVector.parse(cvStr).increment());
+        Assert.assertEquals(cvStr, CorrelationVector.extend(cvStr).getValue());
+        Assert.assertEquals(cvStr, CorrelationVector.spin(cvStr).getValue());
     }
 
     // Increment correlation vector to check for any errors
@@ -182,13 +220,13 @@ public class CorrelationVectorTests {
         final CorrelationVector cV = CorrelationVector
                 .extend("tul4NUsfs9Cl7mOf.2147483647.2147483647.2147483647.21474836479");
         cV.increment();
-        Assert.assertEquals(cV.getValue(), "tul4NUsfs9Cl7mOf.2147483647.2147483647.2147483647.21474836479.1");
+        Assert.assertEquals("tul4NUsfs9Cl7mOf.2147483647.2147483647.2147483647.21474836479.1", cV.getValue());
 
         for (int i = 0; i < 20; ++i) {
             cV.increment();
         }
 
-        Assert.assertEquals(cV.getValue(), "tul4NUsfs9Cl7mOf.2147483647.2147483647.2147483647.21474836479.9");
+        Assert.assertEquals("tul4NUsfs9Cl7mOf.2147483647.2147483647.2147483647.21474836479.9!", cV.getValue());
     }
 
     // Increment correlation vector V2 to check for any errors
@@ -197,15 +235,33 @@ public class CorrelationVectorTests {
         final CorrelationVector cV = CorrelationVector.extend(
                 "KZY+dsX2jEaZesgCPjJ2Ng.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.214");
         cV.increment();
-        Assert.assertEquals(cV.getValue(),
-                "KZY+dsX2jEaZesgCPjJ2Ng.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.214.1");
+        Assert.assertEquals(
+                "KZY+dsX2jEaZesgCPjJ2Ng.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.214.1",
+                cV.getValue());
 
         for (int i = 0; i < 20; ++i) {
             cV.increment();
         }
 
-        Assert.assertEquals(cV.getValue(),
-                "KZY+dsX2jEaZesgCPjJ2Ng.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.214.9");
+        Assert.assertEquals(
+                "KZY+dsX2jEaZesgCPjJ2Ng.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.214.9!",
+                cV.getValue());
+    }
+
+    @Test
+    public void spinOverMaxCVLength() {
+        final String baseVector = "tul4NUsfs9Cl7mOf.2147483647.2147483647.2147483647.214748364.23";
+
+        CorrelationVector cv = CorrelationVector.spin(baseVector);
+        Assert.assertEquals(baseVector + CorrelationVector.CV_TERMINATOR, cv.getValue());
+    }
+
+    @Test
+    public void spinOverMaxCVLengthV2() {
+        final String baseVector = "KZY+dsX2jEaZesgCPjJ2Ng.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.214";
+
+        CorrelationVector cv = CorrelationVector.spin(baseVector);
+        Assert.assertEquals(baseVector + CorrelationVector.CV_TERMINATOR, cv.getValue());
     }
 
     // Validate spin sort
@@ -242,7 +298,7 @@ public class CorrelationVectorTests {
             } catch (final InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
-            ;
+
         }
     }
 
@@ -264,7 +320,7 @@ public class CorrelationVectorTests {
 
     // check length for correlation vector V2
     @Test(expected = IllegalArgumentException.class)
-    public void ThrowWithTooBigCorrelationVectorValueV2() {
+    public void throwWithTooBigCorrelationVectorValueV2() {
         CorrelationVector.VALIDATE_CV_DURING_CREATION = true;
         CorrelationVector.extend(
                 "KZY+dsX2jEaZesgCPjJ2Ng.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647.2147483647");
@@ -272,7 +328,7 @@ public class CorrelationVectorTests {
 
     // check extension length for correlation vector
     @Test(expected = IllegalArgumentException.class)
-    public void ThrowWithTooBigExtensionCorrelationVectorValue() {
+    public void throwWithTooBigExtensionCorrelationVectorValue() {
         CorrelationVector.VALIDATE_CV_DURING_CREATION = true;
 
         CorrelationVector.extend("tul4NUsfs9Cl7mOf.11111111111111111111111111111");
