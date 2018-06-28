@@ -98,7 +98,12 @@ public class CorrelationVector {
                 final String extensionVal = isImmutable
                         ? correlationVector.substring(p + 1, correlationVector.length() - 1)
                         : correlationVector.substring(p + 1);
-                final int extension = Integer.parseInt(extensionVal);
+                int extension = 0;
+                try {
+                    extension = Integer.parseInt(extensionVal);
+                } catch (NumberFormatException nfe) {
+                    return new CorrelationVector();
+                }
                 if (extension >= 0) {
                     return new CorrelationVector(correlationVector.substring(0, p), extension,
                             CorrelationVector.inferVersion(correlationVector, false), isImmutable);
@@ -319,8 +324,14 @@ public class CorrelationVector {
         }
 
         for (int i = 1; i < parts.length; i++) {
-            final int result = Integer.parseInt(parts[i]);
-            if (result < 0) {
+            try {
+                final int result = Integer.parseInt(parts[i]);
+                if (result < 0) {
+                    throw new IllegalArgumentException(
+                            MessageFormat.format("Invalid correlation vector {0}. Invalid extension value {1}",
+                                    correlationVector, parts[i]));
+                }
+            } catch (NumberFormatException nfe) {
                 throw new IllegalArgumentException(MessageFormat.format(
                         "Invalid correlation vector {0}. Invalid extension value {1}", correlationVector, parts[i]));
             }
