@@ -16,7 +16,7 @@ Format: id0[.id1. … .idN], where
 * id0 is a 12 byte randomly generated number that is encoded as a base64 string on the wire. id0 is also referred to as the base value.
 * id1. … .idN are 32 bit unsigned integers
 
-Example: XXI1uDYrTQe7asf7O/0FnU.1.2
+#### Example: XXI1uDYrTQe7asf7O/0FnU.1.2
 
 # Contributing
 
