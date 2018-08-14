@@ -5,18 +5,10 @@
 
 **Correlation Vector** (a.k.a. **cV**) is a format and protocol standard for tracing and correlation of events through a distributed system based on a light weight vector clock.
 The standard is widely used internally at Microsoft for first party applications and services and supported across multiple logging libraries and platforms (Services, Clients - Native, Managed, Js, iOS, Android etc). The standard powers a variety of different data processing needs ranging from distributed tracing & debugging to system and business intelligence, in various business organizations.
-For more on correlation vector, read [future](https://github.com/Microsoft/CorrelationVector) roadmap and [scenarios](https://github.com/Microsoft/CorrelationVector/blob/master/Scenarios.md).
 
-This repo provides reference implementation for Java developers to take full advantage of cV in end-to-end distributed tracing scenarios.
+For more on the correlation vector specification and the scenarios it supports, please refer the [specification](https://github.com/Microsoft/CorrelationVector)
 
-# Format
-
-Format: id0[.id1. … .idN], where
-
-* id0 is a 12 byte randomly generated number that is encoded as a base64 string on the wire. id0 is also referred to as the base value.
-* id1. … .idN are 32 bit unsigned integers
-
-#### Example: XXI1uDYrTQe7asf7O/0FnU.1.2
+This repo provides reference implementation for Java developers to incorporate the cV for their distributed debugging and correlated analytics scenarios.
 
 # Contributing
 
