@@ -7,6 +7,17 @@
 The standard is widely used internally at Microsoft for first party applications and services and supported across multiple logging libraries and platforms (Services, Clients - Native, Managed, Js, iOS, Android etc). The standard powers a variety of different data processing needs ranging from distributed tracing & debugging to system and business intelligence, in various business organizations.
 For more on correlation vector, read [future](https://github.com/Microsoft/CorrelationVector) roadmap and [scenarios](https://github.com/Microsoft/CorrelationVector/blob/master/Scenarios.md).
 
+This repo provides reference implementation for Java developers to take full advantage of cV in end-to-end distributed tracing scenarios.
+
+# Format
+
+Format: id0[.id1. … .idN], where
+
+* id0 is a 12 byte randomly generated number that is encoded as a base64 string on the wire. id0 is also referred to as the base value.
+* id1. … .idN are 32 bit unsigned integers
+
+Example: XXI1uDYrTQe7asf7O/0FnU.1.2
+
 # Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
